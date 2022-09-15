@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ArticleCollection;
+use App\Http\Resources\ArticleResource;
 use App\Models\Article;
 use Illuminate\Http\Request;
+use PhpParser\Node\Arg;
 
 class ArticleController extends Controller
 {
@@ -16,12 +19,7 @@ class ArticleController extends Controller
     {
         $articles = Article::all();
 
-        return response()->json([
-            'data' => $articles,
-            'meta' => [
-                'count' => $articles->count()
-            ]
-        ] , 200);
+        return response()->json(new ArticleCollection($articles) , 200);
     }
 
     /**
@@ -42,7 +40,18 @@ class ArticleController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->validateArticle($request);
+
+        Article::create([
+            'user_id' => 1,
+            'title' => $request->title,
+            'description' => $request->description,
+            'image' => $this->uploadImage($request)
+        ]);
+
+        return response()->json([
+            'message' => 'Created'
+        ],201);
     }
 
     /**
@@ -53,7 +62,12 @@ class ArticleController extends Controller
      */
     public function show($id)
     {
-        //
+        $articles = Article::findOrFail($id);
+
+        return response()->json([
+            'data' => new ArticleResource($articles)
+        ] , 200);
+
     }
 
     /**
@@ -88,5 +102,20 @@ class ArticleController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    private function validateArticle($request)
+    {
+        $request->validate([
+            'title'=> ['required'],
+            'image'=> ['required'],
+        ]);
+    }
+
+    private function uploadImage($request)
+    {
+        return $request->hasFile('image')
+        ? $request->image->store('public')
+        : null;
     }
 }
