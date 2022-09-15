@@ -17,7 +17,7 @@ class ArticleController extends Controller
      */
     public function index()
     {
-        $articles = Article::all();
+        $articles = Article::paginate(5);
 
         return response()->json(new ArticleCollection($articles) , 200);
     }
@@ -96,7 +96,11 @@ class ArticleController extends Controller
      */
     public function destroy($id)
     {
-        //
+        Article::findOrFail($id)->delete();
+
+        return response()->json([
+            'message' => 'deleted '
+        ] , 200);
     }
 
     private function validateArticle($request)
