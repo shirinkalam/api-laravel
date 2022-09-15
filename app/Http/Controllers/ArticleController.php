@@ -62,23 +62,12 @@ class ArticleController extends Controller
      */
     public function show($id)
     {
-        $articles = Article::findOrFail($id);
+        $article = Article::findOrFail($id);
 
         return response()->json([
-            'data' => new ArticleResource($articles)
+            'data' => new ArticleResource($article)
         ] , 200);
 
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
     }
 
     /**
@@ -90,7 +79,13 @@ class ArticleController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $article = Article::findOrFail($id);
+
+        $article->update($request->all());
+
+        return response()->json([
+            'message' => 'updated '
+        ] , 200);
     }
 
     /**
