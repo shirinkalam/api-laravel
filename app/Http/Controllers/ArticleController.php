@@ -10,6 +10,14 @@ use PhpParser\Node\Arg;
 
 class ArticleController extends Controller
 {
+
+
+    public function __construct()
+    {
+        $this->middleware('auth:api')->except(['index','show']);
+    }
+
+
     /**
      * Display a listing of the resource.
      *
@@ -43,7 +51,7 @@ class ArticleController extends Controller
         $this->validateArticle($request);
 
         Article::create([
-            'user_id' => 1,
+            'user_id' => auth('api')->user()->id,
             'title' => $request->title,
             'description' => $request->description,
             'image' => $this->uploadImage($request)
